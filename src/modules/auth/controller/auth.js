@@ -34,7 +34,6 @@ export const signup = asyncHandler(async (req, res, next) => {
     const info = sendEmail(email, "Confirmation Email", message);
     if (info) {
       const saveduser = await newuser.save();
-      logger.info(`${email} signup success`);
       res.status(200).json({ message: "done", saveduserId: saveduser._id });
     } else {
       next(new Error("rejected email", { cause: 400 }));
@@ -58,7 +57,6 @@ export const confirmemail = asyncHandler(async (req, res, next) => {
         .status(400)
         .json({ message: "email already confirmed or in-valid token" });
     } else {
-      logger.info(`${user.email} confirmEmail done`);
       res.status(200).redirect(process.env.FEURL);
     }
   }
