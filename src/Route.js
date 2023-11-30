@@ -22,7 +22,7 @@ export const initlization = (app) => {
   const baseurl = process.env.BASEURL;
   app.use(bodyParser.json({ limit: "20kb" }));
   app.use(bodyParser.urlencoded({ extended: false }));
-  app.use(cors());
+  app.use(cors({}));
   if (process.env.Mood === "DEV") {
     app.use(morgan("dev"));
   } else {

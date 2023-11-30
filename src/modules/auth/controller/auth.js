@@ -34,7 +34,6 @@ export const signup = asyncHandler(async (req, res, next) => {
     const info = sendEmail(email, "Confirmation Email", message);
     if (info) {
       const saveduser = await newuser.save();
-      logger.info(`${email} signup success`);
       res.status(200).json({ message: "done", saveduserId: saveduser._id });
     } else {
       next(new Error("rejected email", { cause: 400 }));
@@ -53,12 +52,10 @@ export const confirmemail = asyncHandler(async (req, res, next) => {
       { confirmEmail: true }
     );
     if (!user) {
-      logger.info(`try to confirm email`);
       res
         .status(400)
         .json({ message: "email already confirmed or in-valid token" });
     } else {
-      logger.info(`${user.email} confirmEmail done`);
       res.status(200).redirect(process.env.FEURL);
     }
   }
@@ -89,7 +86,6 @@ export const login = asyncHandler(async (req, res, next) => {
             process.env.TOKENSIGNIN,
             { expiresIn: "24h" }
           );
-          // logger.info(`${user.email} login success`);
           res.status(200).json({ message: "done", token });
         }
       }
