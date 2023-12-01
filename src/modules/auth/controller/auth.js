@@ -78,7 +78,7 @@ export const login = asyncHandler(async (req, res, next) => {
       } else {
         const match = bcrypt.compareSync(password, user.password);
         if (!match) {
-          next(new Error("i-valid password", { cause: 404 }));
+          next(new Error("in-valid email or password", { cause: 404 }));
         } else {
           await userModel.updateOne({ _id: user._id }, { isOnline: true });
           const token = jwt.sign(
