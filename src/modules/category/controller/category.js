@@ -39,6 +39,21 @@ export const categoryProduct = asyncHandler(async (req, res, next) => {
     : next(Error("there is no Category And Products"));
 });
 
+export const categoryProductName = asyncHandler(async (req, res, next) => {
+  const { categoryName } = req.query;
+  console.log(categoryName);
+  const category = await categoryModel
+    .findOne({ name: categoryName })
+    .populate([
+      {
+        path: "product",
+      },
+    ]);
+  category
+    ? res.json({ message: "done", category })
+    : next(Error("there is no Category "));
+});
+
 export const categoryProductbyid = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
   const category = await categoryModel.find({ _id: id }).populate([

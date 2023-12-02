@@ -14,6 +14,8 @@ categoryrouter.post(
   category.createCategory
 );
 categoryrouter.get("/categoryProduct", category.categoryProduct);
+categoryrouter.get("/categoryProductName", category.categoryProductName);
+
 categoryrouter.get("/categoryProductById/:id", category.categoryProductbyid);
 
 export default categoryrouter;
