@@ -6,7 +6,8 @@ import productendpoint from "./peoduct.endpoint.js";
 import { Mymulter, fileValidation } from "../../service/multer.js";
 import wishListRouter from "../wishlist/wishlistRouter.js";
 import reviewRouter from "../review/reviewRouter.js";
-
+import * as validators from "./productValidation.js";
+import { validation } from "../../middleware/validation.middle.js";
 const productrouter = Router();
 productrouter.use("/:productId/wishlist", wishListRouter);
 productrouter.use("/:productId/review", reviewRouter);
@@ -14,6 +15,7 @@ productrouter.post(
   "/createProduct",
   auth(productendpoint.add),
   Mymulter(fileValidation.image).array("images", 15),
+  validation(validators.createProduct),
   product.addprodcut
 );
 productrouter.get("/getSpecificProduct", product.getproductByname);
@@ -30,5 +32,9 @@ productrouter.delete(
   product.deleteProduct
 );
 productrouter.get("/productList", product.productList);
+productrouter.get("/sellingProduct", product.getBestSellingProducts);
+productrouter.get("/bestDiscount", product.getProductsByHighestDiscount);
+
+
 
 export default productrouter;

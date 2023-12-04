@@ -28,31 +28,35 @@ export const addprodcut = asyncHandler(async (req, res, next) => {
   if (!req.files?.length) {
     next(new Error("images is required"));
   } else {
-    const { name, price, discount, amount, brandId, categoryId } = req.body;
-    if (name) {
-      req.body.slug = slugify(name);
+    const { name, price, discount, amount, brandId, categoryId, description } =
+      req.body;
+    const findCategory = await categoryModel.findOne({ _id: categoryId });
+    if (!findCategory) {
+      return next(new Error("Category is not found", { cause: 400 }));
+    } else {
+      if (name) {
+        req.body.slug = slugify(name);
+      }
+      req.body.stock = amount;
+      if (req.body.discount) {
+        req.body.finalPrice = price - price * ((discount || 0) / 100);
+      }
+      const images = [];
+      const imagePublicId = [];
+      for (const file of req.files) {
+        const { secure_url, public_id } =
+          await CloudinaryMulter.uploader.upload(file.path, {
+            folder: `E-commerce/prodcut/${name}`,
+          });
+        images.push(secure_url);
+        imagePublicId.push(public_id);
+      }
+      req.body.images = images;
+      req.body.imagePublicIds = imagePublicId;
+      req.body.createdBy = req.user._id;
+      const product = await productModel.create(req.body);
+      res.status(200).json({ message: "done", product });
     }
-    req.body.stock = amount;
-    if (req.body.discount) {
-      req.body.finalPrice = price - price * ((discount || 0) / 100);
-    }
-    const images = [];
-    const imagePublicId = [];
-    for (const file of req.files) {
-      const { secure_url, public_id } = await CloudinaryMulter.uploader.upload(
-        file.path,
-        {
-          folder: `E-commerce/prodcut/${name}`,
-        }
-      );
-      images.push(secure_url);
-      imagePublicId.push(public_id);
-    }
-    req.body.images = images;
-    req.body.imagePublicIds = imagePublicId;
-    req.body.createdBy = req.user._id;
-    const product = await productModel.create(req.body);
-    res.status(200).json({ message: "done", product });
   }
 });
 
@@ -152,3 +156,41 @@ export const productList = asyncHandler(async (req, res, next) => {
     .populate(populate);
   return res.status(200).json({ message: "done", List });
 });
+
+export const getBestSellingProducts = asyncHandler(async (req, res, next) => {
+  const result = await productModel.aggregate([
+    {
+      $group: {
+        _id: "$_id",
+        totalQuantitySold: { $sum: "$soldItem" },
+      },
+    },
+    {
+      $sort: { totalQuantitySold: -1 },
+    },
+    {
+      $limit: 15,
+    },
+  ]);
+  const bestSellingProductIds = result.map((item) => item._id);
+
+  const bestSellingProducts = await productModel.find({
+    _id: { $in: bestSellingProductIds },
+    soldItem: { $ne: 0 },
+  });
+  res.status(200).json({ message: "done", bestSellingProducts });
+});
+
+export const getProductsByHighestDiscount = asyncHandler(
+  async (req, res, next) => {
+    const result = await productModel
+      .find({ discount: { $ne: 0 } })
+      .sort({ discount: -1 })
+      .limit(15);
+    if (!result) {
+      return next(new Error("there is no Discounted products", { cause: 404 }));
+    } else {
+      res.status(200).json({ message: "done", result });
+    }
+  }
+);
