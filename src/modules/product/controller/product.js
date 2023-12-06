@@ -194,3 +194,12 @@ export const getProductsByHighestDiscount = asyncHandler(
     }
   }
 );
+
+export const getArrivalProducts = asyncHandler(async (req, res, next) => {
+  const result = await productModel.find().sort({ createdAt: -1 }).limit(15);
+  if (!result) {
+    return next(new Error("there is ", { cause: 404 }));
+  } else {
+    res.status(200).json({ message: "done", result });
+  }
+});

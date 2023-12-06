@@ -1,19 +1,37 @@
 import nodemailer from "nodemailer";
 const sendEmail = async (dest, subject, message, attachments = []) => {
+  // const transporter = nodemailer.createTransport({
+  //   service: "hotmail",
+  //   auth: {
+  //     user: process.env.hotmailEmail,
+  //     pass: process.env.hotmailPassword,
+  //   },
+  // });
+
+  //   const info = await transporter.sendMail({
+  //     from: `E-commerce ${process.env.hotmailEmail}`, // sender address
+  //     to: dest, // list of receivers
+  //     subject: subject, // Subject line
+  //     html: message, // html body
+  //     attachments,
+  //   });
+  //   return info;
+  // };
   const transporter = nodemailer.createTransport({
-    service: "hotmail",
+    service: "gmail",
     auth: {
-      user: process.env.hotmailEmail,
-      pass: process.env.hotmailPassword,
+      user: process.env.nodeMailerEmail,
+      pass: process.env.nodeMailerPassword,
     },
   });
 
   // send mail with defined transport object
   const info = await transporter.sendMail({
-    from: `E-commerce ${process.env.hotmailEmail}`, // sender address
+    from: `E-commerce ${process.env.nodeMailerEmail}`, // sender address
     to: dest, // list of receivers
     subject: subject, // Subject line
     html: message, // html body
+    attachments,
   });
   return info;
 };

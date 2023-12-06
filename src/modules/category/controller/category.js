@@ -28,6 +28,43 @@ export const createCategory = asyncHandler(async (req, res, next) => {
   }
 });
 
+export const updateCategory = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+  const searchCategory = await categoryModel.findById({ _id: id });
+  if (!searchCategory) {
+    return next(new Error("Category not found", { cause: 404 }));
+  } else {
+    const _id = req.user;
+    if (req.body.name) {
+      req.body.slug = slugify(req.body.name);
+    }
+    if (req.file) {
+      const { secure_url, public_id } = await CloudinaryMulter.uploader.upload(
+        req.file.path,
+        { folder: `E-commerce/Category/${searchCategory.name}` }
+      );
+      (req.body.image = secure_url), (req.body.imagePublicId = public_id);
+    }
+    req.body.updatedBy = _id;
+    const category = await categoryModel.findByIdAndUpdate(
+      { _id: id },
+      req.body,
+      { new: true }
+    );
+
+    if (category) {
+      await CloudinaryMulter.uploader.destroy(searchCategory.imagePublicId);
+      res.status(200).json({ message: "done", category });
+    } else {
+      return next(
+        new Error(`fail to update  Category with  ID ${searchCategory._id}`, {
+          cause: 400,
+        })
+      );
+    }
+  }
+});
+
 export const categoryProduct = asyncHandler(async (req, res, next) => {
   const category = await categoryModel.find({}).populate([
     {

@@ -13,6 +13,13 @@ categoryrouter.post(
   Mymulter(fileValidation.image).single("image"),
   category.createCategory
 );
+
+categoryrouter.patch(
+  "/updateCategory/:id",
+  auth(categoryendpoint.update),
+  Mymulter(fileValidation.image).single("image"),
+  category.updateCategory
+);
 categoryrouter.get("/categoryProduct", category.categoryProduct);
 categoryrouter.get("/categoryProductName", category.categoryProductName);
 

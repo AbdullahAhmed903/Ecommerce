@@ -10,6 +10,7 @@ export const createProduct = {
       description: joi.string().min(5),
       amount: joi.number().integer().required(),
       categoryId: joi.string().required(),
+      brandId: joi.string().required(),
       colors: joi.alternatives(joi.string(), joi.array().items(joi.string())),
       size: joi.alternatives(joi.string(), joi.array().items(joi.string())),
     }),
