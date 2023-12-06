@@ -33,8 +33,8 @@ productrouter.delete(
 );
 productrouter.get("/productList", product.productList);
 productrouter.get("/sellingProduct", product.getBestSellingProducts);
+productrouter.get("/bestDiscount", product.getProductsByHighestDiscount);
+
 productrouter.get("/arrivalProducts", product.getArrivalProducts);
-
-
 
 export default productrouter;
